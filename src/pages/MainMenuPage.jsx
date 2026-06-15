@@ -30,6 +30,9 @@ function MainMenuPage() {
   const [authMessage, setAuthMessage] = useState({ text: "", isError: false });
   const [rankingList, setRankingList] = useState([]);
 
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [bannerUrl, setBannerUrl] = useState("");
+
   const getBaseUrl = () => {
     return serverIp.startsWith("http") ? serverIp : `http://${serverIp}`;
   };
@@ -75,6 +78,17 @@ function MainMenuPage() {
       loadRanking();
     }
   }, [isRankingModalOpen, isServerConnected]);
+
+  useEffect(() => {
+    if (usuarioLogado) {
+      setAvatarUrl(
+        localStorage.getItem(`avatar_${usuarioLogado.nomeUsuario}`) || "",
+      );
+      setBannerUrl(
+        localStorage.getItem(`banner_${usuarioLogado.nomeUsuario}`) || "",
+      );
+    }
+  }, [usuarioLogado, isAuthModalOpen]);
 
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
@@ -130,6 +144,14 @@ function MainMenuPage() {
     }
   };
 
+  const handleSaveCustomization = () => {
+    if (usuarioLogado) {
+      localStorage.setItem(`avatar_${usuarioLogado.nomeUsuario}`, avatarUrl);
+      localStorage.setItem(`banner_${usuarioLogado.nomeUsuario}`, bannerUrl);
+      alert("Customização salva localmente!");
+    }
+  };
+
   const handleLogout = () => {
     setUsuarioLogado(null);
     localStorage.removeItem("cardgame_user");
@@ -157,7 +179,7 @@ function MainMenuPage() {
 
       <div
         className={`h-full flex flex-col justify-center gap-16 z-10 transition-all duration-300 ease-out
-          ${isHovered ? "pl-[75px]" : "pl-[5px]"}`}
+          ${isHovered ? "pl-[95px]" : "pl-[5px]"}`}
       >
         <MenuButton text="Jogar" iconSrc={PlayImg} />
         <MenuButton text="Inventário" iconSrc={PackageImg} />
@@ -166,8 +188,8 @@ function MainMenuPage() {
       </div>
 
       <div
-        className={`absolute left-0 top-0 h-full w-[80px] bg-[#C8911A] flex flex-col justify-between items-center py-6 z-20 shadow-xl transition-all duration-300 ease-out
-          ${isHovered ? "translate-x-0 pl-0" : "-translate-x-[68px] pl-[68px]"}`}
+        className={`absolute left-0 top-0 h-full w-[100px] bg-[#C8911A] flex flex-col justify-between items-center py-6 z-20 shadow-xl transition-all duration-300 ease-out
+          ${isHovered ? "translate-x-0 pl-0" : "-translate-x-[88px] pl-[88px]"}`}
       >
         <div className="flex flex-col items-center gap-8 w-full transition-opacity duration-200">
           <button
@@ -183,9 +205,29 @@ function MainMenuPage() {
 
           <button
             onClick={() => setIsAuthModalOpen(true)}
-            className={`cursor-pointer transition-all duration-200 hover:scale-125 active:scale-90 [filter:brightness(0)] ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            className={`cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 flex flex-col items-center gap-1 w-full px-2 ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
           >
-            <img src={UserImg} alt="Perfil" className="w-[35px] h-[35px]" />
+            {usuarioLogado &&
+            localStorage.getItem(`avatar_${usuarioLogado.nomeUsuario}`) ? (
+              <img
+                src={localStorage.getItem(
+                  `avatar_${usuarioLogado.nomeUsuario}`,
+                )}
+                alt="Perfil"
+                className="w-[45px] h-[45px] rounded-full object-cover border-2 border-[#1B1B2F]"
+              />
+            ) : (
+              <img
+                src={UserImg}
+                alt="Perfil"
+                className="w-[35px] h-[35px] [filter:brightness(0)]"
+              />
+            )}
+            {usuarioLogado && (
+              <span className="text-[11px] font-bold text-[#1B1B2F] truncate max-w-full block">
+                {usuarioLogado.nomeUsuario}
+              </span>
+            )}
           </button>
         </div>
 
@@ -225,7 +267,7 @@ function MainMenuPage() {
 
       <div
         className={`absolute bottom-4 left-4 z-30 flex items-center gap-2 bg-[#21366B]/95 border-2 border-[#C8911A] p-2 rounded-[12px] transition-all duration-300 shadow-lg
-          ${isHovered ? "translate-x-[75px]" : "translate-x-0"}`}
+          ${isHovered ? "translate-x-[95px]" : "translate-x-0"}`}
       >
         <span
           className={`w-3 h-3 rounded-full ${isServerConnected ? "bg-green-500 shadow-[0_0_8px_#22c55e]" : "bg-red-500 shadow-[0_0_8px_#ef4444]"}`}
@@ -237,7 +279,7 @@ function MainMenuPage() {
           type="text"
           value={serverIp}
           onChange={(e) => setServerIp(e.target.value)}
-          placeholder="Ex: 192.168.1.50:5000"
+          placeholder="Ex: 192.168.1.50:5262"
           className="bg-[#1B1B2F] text-white font-mono text-[14px] px-2 py-1 rounded border border-gray-600 focus:outline-none focus:border-[#C8911A] w-[180px]"
         />
         <button
@@ -249,56 +291,130 @@ function MainMenuPage() {
       </div>
 
       {isAuthModalOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-[#1B1B2F] border-2 border-[#C8911A] rounded-[20px] max-w-md w-full p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-[#1c1c32] border border-[#C8911A]/40 rounded-[16px] max-w-4xl w-full shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
             <button
               onClick={() => {
                 setIsAuthModalOpen(false);
                 setAuthMessage({ text: "", isError: false });
               }}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold transition-colors"
+              className="absolute top-4 right-4 text-white/70 hover:text-white text-xl font-bold z-50 bg-black/40 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
             >
               ✕
             </button>
 
             {usuarioLogado ? (
-              <div className="text-center py-4">
-                <h3 className="text-[#C8911A] text-[28px] font-bold mb-4">
-                  Seu Perfil
-                </h3>
-                <div className="space-y-2 text-left bg-[#21366B]/40 p-4 rounded-[12px] border border-[#21366B] mb-6">
-                  <p>
-                    <span className="text-gray-400">Usuário:</span>{" "}
-                    <strong className="text-white">
-                      {usuarioLogado.nomeUsuario}
-                    </strong>
-                  </p>
-                  <p>
-                    <span className="text-gray-400">
-                      Pontos de Classificação:
-                    </span>{" "}
-                    <strong className="text-green-400">
-                      {usuarioLogado.pontos} XP
-                    </strong>
-                  </p>
-                  <p>
-                    <span className="text-gray-400">Moedas em Ouro:</span>{" "}
-                    <strong className="text-yellow-400">
-                      {usuarioLogado.moedas}G
-                    </strong>
-                  </p>
+              <div className="flex flex-col h-full overflow-y-auto">
+                <div className="h-48 w-full bg-[#141423] relative flex-shrink-0">
+                  {bannerUrl ? (
+                    <img
+                      src={bannerUrl}
+                      alt="Banner"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-r from-[#21366B] to-[#1B1B2F]" />
+                  )}
+                  <div className="absolute -bottom-12 left-8 flex items-end gap-4">
+                    <div className="w-24 h-24 rounded-full border-4 border-[#1c1c32] bg-[#21366B] overflow-hidden flex-shrink-0 shadow-lg">
+                      {avatarUrl ? (
+                        <img
+                          src={avatarUrl}
+                          alt="Avatar"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-xl font-bold uppercase">
+                          {usuarioLogado.nomeUsuario.substring(0, 2)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="mb-2">
+                      <h3 className="text-2xl font-bold text-white drop-shadow-md">
+                        {usuarioLogado.nomeUsuario}
+                      </h3>
+                      <span className="bg-[#C8911A] text-black text-[11px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">
+                        Jogador Ativo
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-[8px] transition-all active:scale-95"
-                >
-                  Desconectar Conta
-                </button>
+
+                <div className="pt-16 p-8 grid grid-cols-1 md:grid-cols-3 gap-6 flex-1">
+                  <div className="md:col-span-2 space-y-4">
+                    <div className="bg-[#141423] p-4 rounded-[8px] border border-white/5">
+                      <h4 className="text-[#C8911A] font-bold text-sm uppercase tracking-wider mb-3">
+                        Customizar Perfil
+                      </h4>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">
+                            URL da Imagem de Avatar
+                          </label>
+                          <input
+                            type="text"
+                            value={avatarUrl}
+                            onChange={(e) => setAvatarUrl(e.target.value)}
+                            placeholder="https://link-da-imagem.com/foto.jpg"
+                            className="w-full bg-[#1b1b2f] border border-white/10 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-[#C8911A]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">
+                            URL da Imagem de Banner
+                          </label>
+                          <input
+                            type="text"
+                            value={bannerUrl}
+                            onChange={(e) => setBannerUrl(e.target.value)}
+                            placeholder="https://link-da-imagem.com/banner.jpg"
+                            className="w-full bg-[#1b1b2f] border border-white/10 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-[#C8911A]"
+                          />
+                        </div>
+                        <button
+                          onClick={handleSaveCustomization}
+                          className="bg-[#21366B] hover:brightness-110 text-white font-bold text-xs py-2 px-4 rounded transition-all cursor-pointer"
+                        >
+                          Salvar Customização
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="bg-[#141423] p-4 rounded-[8px] border border-white/5 space-y-3 text-sm">
+                      <h4 className="text-[#C8911A] font-bold text-sm uppercase tracking-wider border-b border-white/10 pb-1">
+                        Estatísticas
+                      </h4>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">
+                          Pontos de Ranking:
+                        </span>
+                        <span className="font-mono text-green-400 font-bold">
+                          {usuarioLogado.pontos} P
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Moedas:</span>
+                        <span className="font-mono text-yellow-400 font-bold">
+                          {usuarioLogado.moedas}G
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleLogout}
+                      className="w-full bg-red-600/20 hover:bg-red-600 border border-red-600/40 text-white font-bold py-2 rounded transition-all text-sm cursor-pointer"
+                    >
+                      Sair da Conta
+                    </button>
+                  </div>
+                </div>
               </div>
             ) : (
-              <div>
+              <div className="p-8 max-w-md mx-auto w-full py-16">
                 <h3 className="text-center text-[#C8911A] text-[28px] font-bold mb-6">
-                  {isRegisterMode ? "Criar Conta" : "Acessar Sistema"}
+                  {isRegisterMode ? "Criar Conta" : "Entrar"}
                 </h3>
                 <form onSubmit={handleAuthSubmit} className="space-y-4">
                   <div>
@@ -309,19 +425,19 @@ function MainMenuPage() {
                       type="text"
                       value={usernameInput}
                       onChange={(e) => setUsernameInput(e.target.value)}
-                      className="w-full bg-[#21366B]/50 border border-gray-600 rounded-[8px] px-3 py-2 focus:outline-none focus:border-[#C8911A]"
-                      placeholder="Digite seu nickname"
+                      className="w-full bg-[#141423] border border-white/10 rounded-[8px] px-3 py-2 focus:outline-none focus:border-[#C8911A]"
+                      placeholder="Digite seu username"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1 text-gray-300">
-                      Senha Secreta
+                      Senha
                     </label>
                     <input
                       type="password"
                       value={passwordInput}
                       onChange={(e) => setPasswordInput(e.target.value)}
-                      className="w-full bg-[#21366B]/50 border border-gray-600 rounded-[8px] px-3 py-2 focus:outline-none focus:border-[#C8911A]"
+                      className="w-full bg-[#141423] border border-white/10 rounded-[8px] px-3 py-2 focus:outline-none focus:border-[#C8911A]"
                       placeholder="Digite sua senha"
                     />
                   </div>
@@ -336,9 +452,9 @@ function MainMenuPage() {
 
                   <button
                     type="submit"
-                    className="w-full bg-[#C8911A] hover:brightness-110 text-black font-bold py-2 rounded-[8px] transition-all active:scale-95"
+                    className="w-full bg-[#C8911A] hover:brightness-110 text-black font-bold py-2 rounded-[8px] transition-all active:scale-95 cursor-pointer"
                   >
-                    {isRegisterMode ? "Registrar Agora" : "Entrar no Jogo"}
+                    {isRegisterMode ? "Registrar Agora" : "Entrar na Conta"}
                   </button>
                 </form>
 
@@ -348,7 +464,7 @@ function MainMenuPage() {
                       setIsRegisterMode(!isRegisterMode);
                       setAuthMessage({ text: "", isError: false });
                     }}
-                    className="text-[#C8911A] hover:underline"
+                    className="text-[#C8911A] hover:underline cursor-pointer"
                   >
                     {isRegisterMode
                       ? "Já tem conta? Faça login"
@@ -384,8 +500,7 @@ function MainMenuPage() {
                   Conecte-se ao servidor primeiro
                 </span>
                 <p className="text-sm max-w-xs">
-                  Insira um IP local válido no rodapé antes de acessar o
-                  Ranking.
+                  Insira um IP local válido antes de acessar o Ranking.
                 </p>
               </div>
             ) : (
@@ -413,7 +528,18 @@ function MainMenuPage() {
                         <span className={`w-16 ${colorClass}`}>
                           {position}º
                         </span>
-                        <span className="flex-1 text-left px-4 font-semibold">
+                        <span className="flex-1 text-left px-4 font-semibold flex items-center gap-2">
+                          {localStorage.getItem(
+                            `avatar_${player.nomeUsuario}`,
+                          ) && (
+                            <img
+                              src={localStorage.getItem(
+                                `avatar_${player.nomeUsuario}`,
+                              )}
+                              alt=""
+                              className="w-6 h-6 rounded-full object-cover flex-shrink-0"
+                            />
+                          )}
                           {player.nomeUsuario}
                         </span>
                         <span className="w-24 text-green-400 font-mono">
