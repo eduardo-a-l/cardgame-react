@@ -281,11 +281,13 @@ function MainMenuPage() {
         </button>
       </div>
 
-      <img
-        src={LogoImg}
-        alt="Logo"
-        className="w-[480px] h-[480px] object-contain"
-      />
+      <div className="absolute right-[25%] top-1/2 -translate-y-1/2 select-none pointer-events-none z-10">
+        <img
+          src={LogoImg}
+          alt="Logo"
+          className="w-[480px] h-[480px] object-contain"
+        />
+      </div>
 
       <div className="absolute bottom-8 -right-2 z-10">
         <MenuButton
