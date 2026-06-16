@@ -45,7 +45,7 @@ function RankingModal({
             </div>
 
             <div className="flex-1 overflow-y-auto divide-y divide-[#21366B]/50 font-sans">
-              {rankingList.map((player, index) => {
+              {rankingList.map((player) => {
                 const primeiroEmpatado = rankingList.find(
                   (p) => p.pontos === player.pontos,
                 );
@@ -60,10 +60,19 @@ function RankingModal({
                   <div
                     key={player.idUsuario}
                     onClick={() => onSelectPlayer(player)}
-                    className="flex p-3 text-center items-center hover:bg-[#21366B]/20 transition-colors cursor-pointer"
+                    className="relative flex p-3 text-center items-center hover:bg-[#21366B]/30 transition-colors cursor-pointer overflow-hidden group"
                   >
-                    <span className={`w-16 ${colorClass}`}>{position}º</span>
-                    <span className="flex-1 text-left px-4 font-semibold flex items-center gap-2">
+                    {player.banner && (
+                      <div
+                        className="absolute inset-0 pointer-events-none opacity-10 group-hover:opacity-20 transition-opacity bg-cover bg-center z-0"
+                        style={{ backgroundImage: `url(${player.banner})` }}
+                      />
+                    )}
+
+                    <span className={`w-16 relative z-10 ${colorClass}`}>
+                      {position}º
+                    </span>
+                    <span className="flex-1 text-left px-4 font-semibold flex items-center gap-2 relative z-10">
                       {player.fotoPerfil && (
                         <img
                           src={player.fotoPerfil}
@@ -73,10 +82,10 @@ function RankingModal({
                       )}
                       {player.nomeUsuario}
                     </span>
-                    <span className="w-24 text-green-400 font-mono">
+                    <span className="w-24 text-green-400 font-mono relative z-10">
                       {player.pontos}
                     </span>
-                    <span className="w-24 text-[#C8911A] font-mono">
+                    <span className="w-24 text-[#C8911A] font-mono relative z-10">
                       {player.moedas}G
                     </span>
                   </div>

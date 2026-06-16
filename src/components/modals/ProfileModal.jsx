@@ -1,3 +1,6 @@
+import { useState, useEffect } from "react";
+import IconRankingImg from "../../assets/IconRanking.svg";
+
 function ProfileModal({
   isOpen,
   onClose,
