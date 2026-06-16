@@ -81,12 +81,8 @@ function MainMenuPage() {
 
   useEffect(() => {
     if (usuarioLogado) {
-      setAvatarUrl(
-        localStorage.getItem(`avatar_${usuarioLogado.nomeUsuario}`) || "",
-      );
-      setBannerUrl(
-        localStorage.getItem(`banner_${usuarioLogado.nomeUsuario}`) || "",
-      );
+      setAvatarUrl(usuarioLogado.fotoPerfil || "");
+      setBannerUrl(usuarioLogado.banner || "");
     }
   }, [usuarioLogado, isAuthModalOpen]);
 
@@ -144,11 +140,38 @@ function MainMenuPage() {
     }
   };
 
-  const handleSaveCustomization = () => {
-    if (usuarioLogado) {
-      localStorage.setItem(`avatar_${usuarioLogado.nomeUsuario}`, avatarUrl);
-      localStorage.setItem(`banner_${usuarioLogado.nomeUsuario}`, bannerUrl);
-      alert("Customização salva localmente!");
+  const handleSaveCustomization = async () => {
+    if (!usuarioLogado || !isServerConnected) return;
+
+    const payload = {
+      idUsuario: usuarioLogado.idUsuario,
+      fotoPerfil: avatarUrl || null,
+      banner: bannerUrl || null,
+    };
+
+    try {
+      const res = await fetch(`${getBaseUrl()}/usuarios/customizar`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        const usuarioAtualizado = await res.json();
+
+        setUsuarioLogado(usuarioAtualizado);
+        localStorage.setItem(
+          "cardgame_user",
+          JSON.stringify(usuarioAtualizado),
+        );
+
+        alert("Customização salva com sucesso no banco de dados!");
+      } else {
+        alert("Erro ao salvar customização na API.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Erro de conexão ao tentar salvar customização.");
     }
   };
 
@@ -194,7 +217,7 @@ function MainMenuPage() {
         <div className="flex flex-col items-center gap-8 w-full transition-opacity duration-200">
           <button
             onClick={() => setIsRankingModalOpen(true)}
-            className={`cursor-pointer transition-all duration-200 hover:scale-125 active:scale-90 [filter:brightness(0)] ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            className={`cursor-pointer transition-all duration-200 hover:scale-125 active:scale-90 filter-[brightness(0)] ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
           >
             <img
               src={IconRankingImg}
@@ -207,12 +230,9 @@ function MainMenuPage() {
             onClick={() => setIsAuthModalOpen(true)}
             className={`cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 flex flex-col items-center gap-1 w-full px-2 ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
           >
-            {usuarioLogado &&
-            localStorage.getItem(`avatar_${usuarioLogado.nomeUsuario}`) ? (
+            {usuarioLogado && usuarioLogado.fotoPerfil ? (
               <img
-                src={localStorage.getItem(
-                  `avatar_${usuarioLogado.nomeUsuario}`,
-                )}
+                src={usuarioLogado.fotoPerfil}
                 alt="Perfil"
                 className="w-[45px] h-[45px] rounded-full object-cover border-2 border-[#1B1B2F]"
               />
@@ -220,7 +240,7 @@ function MainMenuPage() {
               <img
                 src={UserImg}
                 alt="Perfil"
-                className="w-[35px] h-[35px] [filter:brightness(0)]"
+                className="w-[35px] h-[35px] filter-[brightness(0)]"
               />
             )}
             {usuarioLogado && (
@@ -232,7 +252,7 @@ function MainMenuPage() {
         </div>
 
         <button
-          className={`cursor-pointer transition-all duration-300 hover:rotate-90 active:scale-90 [filter:brightness(0)] ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+          className={`cursor-pointer transition-all duration-300 hover:rotate-90 active:scale-90 filter-[brightness(0)] ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
           <img
             src={SettingsImg}
@@ -266,7 +286,7 @@ function MainMenuPage() {
       </div>
 
       <div
-        className={`absolute bottom-4 left-4 z-30 flex items-center gap-2 bg-[#21366B]/95 border-2 border-[#C8911A] p-2 rounded-[12px] transition-all duration-300 shadow-lg
+        className={`absolute bottom-4 left-4 z-30 flex items-center gap-2 bg-[#21366B]/95 border-2 border-[#C8911A] p-2 rounded-xl transition-all duration-300 shadow-lg
           ${isHovered ? "translate-x-[95px]" : "translate-x-0"}`}
       >
         <span
@@ -284,7 +304,7 @@ function MainMenuPage() {
         />
         <button
           onClick={() => testConnection(false)}
-          className="bg-[#C8911A] text-black font-bold text-[12px] px-3 py-1 rounded-[6px] cursor-pointer hover:brightness-110 active:scale-95 transition-all"
+          className="bg-[#C8911A] text-black font-bold text-[12px] px-3 py-1 rounded-md cursor-pointer hover:brightness-110 active:scale-95 transition-all"
         >
           Testar
         </button>
@@ -292,7 +312,7 @@ function MainMenuPage() {
 
       {isAuthModalOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-[#1c1c32] border border-[#C8911A]/40 rounded-[16px] max-w-4xl w-full shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-[#1c1c32] border border-[#C8911A]/40 rounded-2xl max-w-4xl w-full shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
             <button
               onClick={() => {
                 setIsAuthModalOpen(false);
@@ -305,21 +325,21 @@ function MainMenuPage() {
 
             {usuarioLogado ? (
               <div className="flex flex-col h-full overflow-y-auto">
-                <div className="h-48 w-full bg-[#141423] relative flex-shrink-0">
-                  {bannerUrl ? (
+                <div className="h-48 w-full bg-[#141423] relative shrink-0">
+                  {usuarioLogado.banner ? (
                     <img
-                      src={bannerUrl}
+                      src={usuarioLogado.banner}
                       alt="Banner"
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-r from-[#21366B] to-[#1B1B2F]" />
+                    <div className="w-full h-full bg-linear-to-r from-[#21366B] to-[#1B1B2F]" />
                   )}
                   <div className="absolute -bottom-12 left-8 flex items-end gap-4">
-                    <div className="w-24 h-24 rounded-full border-4 border-[#1c1c32] bg-[#21366B] overflow-hidden flex-shrink-0 shadow-lg">
-                      {avatarUrl ? (
+                    <div className="w-24 h-24 rounded-full border-4 border-[#1c1c32] bg-[#21366B] overflow-hidden shrink-0 shadow-lg">
+                      {usuarioLogado.fotoPerfil ? (
                         <img
-                          src={avatarUrl}
+                          src={usuarioLogado.fotoPerfil}
                           alt="Avatar"
                           className="w-full h-full object-cover"
                         />
@@ -342,7 +362,7 @@ function MainMenuPage() {
 
                 <div className="pt-16 p-8 grid grid-cols-1 md:grid-cols-3 gap-6 flex-1">
                   <div className="md:col-span-2 space-y-4">
-                    <div className="bg-[#141423] p-4 rounded-[8px] border border-white/5">
+                    <div className="bg-[#141423] p-4 rounded-lg border border-white/5">
                       <h4 className="text-[#C8911A] font-bold text-sm uppercase tracking-wider mb-3">
                         Customizar Perfil
                       </h4>
@@ -382,7 +402,7 @@ function MainMenuPage() {
                   </div>
 
                   <div className="space-y-4">
-                    <div className="bg-[#141423] p-4 rounded-[8px] border border-white/5 space-y-3 text-sm">
+                    <div className="bg-[#141423] p-4 rounded-lg border border-white/5 space-y-3 text-sm">
                       <h4 className="text-[#C8911A] font-bold text-sm uppercase tracking-wider border-b border-white/10 pb-1">
                         Estatísticas
                       </h4>
@@ -425,7 +445,7 @@ function MainMenuPage() {
                       type="text"
                       value={usernameInput}
                       onChange={(e) => setUsernameInput(e.target.value)}
-                      className="w-full bg-[#141423] border border-white/10 rounded-[8px] px-3 py-2 focus:outline-none focus:border-[#C8911A]"
+                      className="w-full bg-[#141423] border border-white/10 rounded-lg px-3 py-2 focus:outline-none focus:border-[#C8911A]"
                       placeholder="Digite seu username"
                     />
                   </div>
@@ -437,7 +457,7 @@ function MainMenuPage() {
                       type="password"
                       value={passwordInput}
                       onChange={(e) => setPasswordInput(e.target.value)}
-                      className="w-full bg-[#141423] border border-white/10 rounded-[8px] px-3 py-2 focus:outline-none focus:border-[#C8911A]"
+                      className="w-full bg-[#141423] border border-white/10 rounded-lg px-3 py-2 focus:outline-none focus:border-[#C8911A]"
                       placeholder="Digite sua senha"
                     />
                   </div>
@@ -452,7 +472,7 @@ function MainMenuPage() {
 
                   <button
                     type="submit"
-                    className="w-full bg-[#C8911A] hover:brightness-110 text-black font-bold py-2 rounded-[8px] transition-all active:scale-95 cursor-pointer"
+                    className="w-full bg-[#C8911A] hover:brightness-110 text-black font-bold py-2 rounded-lg transition-all active:scale-95 cursor-pointer"
                   >
                     {isRegisterMode ? "Registrar Agora" : "Entrar na Conta"}
                   </button>
@@ -504,7 +524,7 @@ function MainMenuPage() {
                 </p>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col overflow-hidden border border-[#21366B] rounded-[8px]">
+              <div className="flex-1 flex flex-col overflow-hidden border border-[#21366B] rounded-lg">
                 <div className="flex bg-[#21366B] p-3 text-sm font-bold text-center border-b border-[#21366B]">
                   <span className="w-16">Posição</span>
                   <span className="flex-1 text-left px-4">Nome de Usuário</span>
@@ -529,15 +549,11 @@ function MainMenuPage() {
                           {position}º
                         </span>
                         <span className="flex-1 text-left px-4 font-semibold flex items-center gap-2">
-                          {localStorage.getItem(
-                            `avatar_${player.nomeUsuario}`,
-                          ) && (
+                          {player.fotoPerfil && (
                             <img
-                              src={localStorage.getItem(
-                                `avatar_${player.nomeUsuario}`,
-                              )}
+                              src={player.fotoPerfil}
                               alt=""
-                              className="w-6 h-6 rounded-full object-cover flex-shrink-0"
+                              className="w-6 h-6 rounded-full object-cover shrink-0 border border-[#C8911A]/40"
                             />
                           )}
                           {player.nomeUsuario}
