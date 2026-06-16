@@ -15,6 +15,7 @@ import ProfileModal from "../components/modals/ProfileModal.jsx";
 import RankingModal from "../components/modals/RankingModal.jsx";
 import SettingsModal from "../components/modals/SettingsModal.jsx";
 import ProfilePopover from "../components/ProfilePopover.jsx";
+import InventarioPage from "./InventarioPage.jsx";
 import { useMenuViewModel } from "../viewmodels/MenuViewModel.jsx";
 
 function MainMenuPage() {
@@ -42,8 +43,8 @@ function MainMenuPage() {
           Resolução não suportada
         </span>
         <p className="text-gray-400 text-sm max-w-xs">
-          A tela do seu dispositivo é muito pequena. Por favor utilize uma tela
-          maior.
+          A tela do seu dispositivo é muito pequena para abrir este painel. Por
+          favor utilize uma tela maior.
         </p>
       </div>
 
