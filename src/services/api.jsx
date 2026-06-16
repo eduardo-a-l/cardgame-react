@@ -1,7 +1,7 @@
 class ApiService {
   constructor() {
     this.serverIp =
-      localStorage.getItem("cardgame_server_ip") || "localhost:5262";
+      localStorage.getItem("cardgame_server_ip") || "localhost:5000";
   }
 
   setServerIp(ip) {
@@ -40,6 +40,12 @@ class ApiService {
     return res.json();
   }
 
+  async getUsuarioById(id) {
+    const res = await fetch(`${this.getBaseUrl()}/usuarios/${id}`);
+    if (!res.ok) throw new Error();
+    return res.json();
+  }
+
   async customizar(idUsuario, avatarUrl, bannerUrl) {
     const res = await fetch(`${this.getBaseUrl()}/usuarios/customizar`, {
       method: "PUT",
@@ -58,6 +64,14 @@ class ApiService {
     const res = await fetch(`${this.getBaseUrl()}/usuarios/ranking`);
     if (!res.ok) throw new Error();
     return res.json();
+  }
+
+  async deletarConta(id) {
+    const res = await fetch(`${this.getBaseUrl()}/usuarios/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) throw new Error();
+    return true;
   }
 }
 

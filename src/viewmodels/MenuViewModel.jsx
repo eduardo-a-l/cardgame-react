@@ -5,14 +5,20 @@ export function useMenuViewModel() {
   const [isHovered, setIsHovered] = useState(false);
   const [serverIp, setServerIpState] = useState(apiService.serverIp);
   const [isServerConnected, setIsServerConnected] = useState(false);
+  const [uiScale, setUiScale] = useState(
+    () => localStorage.getItem("cardgame_ui_scale") || "100",
+  );
+
   const [usuarioLogado, setUsuarioLogado] = useState(() => {
     const salvo = localStorage.getItem("cardgame_user");
     return salvo ? JSON.parse(salvo) : null;
   });
 
+  const [isProfilePopoverOpen, setIsProfilePopoverOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isRankingModalOpen, setIsRankingModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [perfilVisualizado, setPerfilVisualizado] = useState(null);
 
   const [isRegisterMode, setIsRegisterMode] = useState(false);
@@ -45,6 +51,10 @@ export function useMenuViewModel() {
     testConnection(true);
   }, [serverIp]);
 
+  useEffect(() => {
+    localStorage.setItem("cardgame_ui_scale", uiScale);
+  }, [uiScale]);
+
   const loadRanking = async () => {
     if (!isServerConnected) return;
     try {
@@ -68,6 +78,24 @@ export function useMenuViewModel() {
     }
   }, [usuarioLogado, isProfileModalOpen]);
 
+  const handleSelectUserFromRanking = async (playerSummary) => {
+    try {
+      const usuarioCompleto = await apiService.getUsuarioById(
+        playerSummary.idUsuario,
+      );
+      setPerfilVisualizado(usuarioCompleto);
+      setIsProfileModalOpen(true);
+    } catch (err) {
+      setPerfilVisualizado(playerSummary);
+      setIsProfileModalOpen(true);
+    }
+  };
+
+  const openAuthModalWithMode = (registerMode) => {
+    setIsRegisterMode(registerMode);
+    setIsAuthModalOpen(true);
+  };
+
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
     setAuthMessage({ text: "", isError: false });
@@ -86,8 +114,9 @@ export function useMenuViewModel() {
         });
       } else {
         const data = await apiService.login(usernameInput, passwordInput);
-        setUsuarioLogado(data);
-        localStorage.setItem("cardgame_user", JSON.stringify(data));
+        const completo = await apiService.getUsuarioById(data.idUsuario);
+        setUsuarioLogado(completo);
+        localStorage.setItem("cardgame_user", JSON.stringify(completo));
         setIsAuthModalOpen(false);
         setUsernameInput("");
         setPasswordInput("");
@@ -116,10 +145,13 @@ export function useMenuViewModel() {
         avatarUrl,
         bannerUrl,
       );
-      setUsuarioLogado(usuarioAtualizado);
-      setPerfilVisualizado(usuarioAtualizado);
-      localStorage.setItem("cardgame_user", JSON.stringify(usuarioAtualizado));
-      alert("Customização salva com sucesso no banco de dados!");
+      const completo = await apiService.getUsuarioById(
+        usuarioAtualizado.idUsuario,
+      );
+      setUsuarioLogado(completo);
+      setPerfilVisualizado(completo);
+      localStorage.setItem("cardgame_user", JSON.stringify(completo));
+      alert("Customização salva com sucesso!");
       loadRanking();
     } catch (err) {
       console.error(err);
@@ -131,7 +163,27 @@ export function useMenuViewModel() {
     setUsuarioLogado(null);
     setPerfilVisualizado(null);
     setIsProfileModalOpen(false);
+    setIsSettingsModalOpen(false);
+    setIsProfilePopoverOpen(false);
     localStorage.removeItem("cardgame_user");
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!usuarioLogado) return;
+    if (
+      !window.confirm(
+        "ATENÇÃO: Tem certeza que deseja deletar sua conta permanentemente? Todos os seus dados serão apagados.",
+      )
+    )
+      return;
+
+    try {
+      await apiService.deletarConta(usuarioLogado.idUsuario);
+      alert("Conta deletada com sucesso.");
+      handleLogout();
+    } catch (err) {
+      alert("Erro ao deletar conta do servidor.");
+    }
   };
 
   return {
@@ -140,13 +192,19 @@ export function useMenuViewModel() {
     serverIp,
     setServerIpState,
     isServerConnected,
+    uiScale,
+    setUiScale,
     usuarioLogado,
+    isProfilePopoverOpen,
+    setIsProfilePopoverOpen,
     isAuthModalOpen,
     setIsAuthModalOpen,
     isRankingModalOpen,
     setIsRankingModalOpen,
     isProfileModalOpen,
     setIsProfileModalOpen,
+    isSettingsModalOpen,
+    setIsSettingsModalOpen,
     perfilVisualizado,
     setPerfilVisualizado,
     isRegisterMode,
@@ -163,8 +221,11 @@ export function useMenuViewModel() {
     bannerUrl,
     setBannerUrl,
     testConnection,
+    handleSelectUserFromRanking,
+    openAuthModalWithMode,
     handleAuthSubmit,
     handleSaveCustomization,
     handleLogout,
+    handleDeleteAccount,
   };
 }

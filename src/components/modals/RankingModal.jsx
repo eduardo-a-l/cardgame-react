@@ -64,7 +64,7 @@ function RankingModal({
                   >
                     {player.banner && (
                       <div
-                        className="absolute inset-0 pointer-events-none opacity-10 group-hover:opacity-20 transition-opacity bg-cover bg-center z-0"
+                        className="absolute inset-0 pointer-events-none opacity-15 group-hover:opacity-30 transition-opacity bg-cover bg-center z-0"
                         style={{ backgroundImage: `url(${player.banner})` }}
                       />
                     )}

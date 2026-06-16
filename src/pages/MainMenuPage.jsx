@@ -13,6 +13,8 @@ import MenuButton from "../components/MenuButton";
 import AuthModal from "../components/modals/AuthModal.jsx";
 import ProfileModal from "../components/modals/ProfileModal.jsx";
 import RankingModal from "../components/modals/RankingModal.jsx";
+import SettingsModal from "../components/modals/SettingsModal.jsx";
+import ProfilePopover from "../components/ProfilePopover.jsx";
 import { useMenuViewModel } from "../viewmodels/MenuViewModel.jsx";
 
 function MainMenuPage() {
@@ -20,7 +22,13 @@ function MainMenuPage() {
 
   return (
     <div
-      className="relative w-screen h-screen bg-[#1B1B2F] overflow-hidden flex font-sans text-white select-none"
+      style={{
+        transform: `scale(${vm.uiScale / 100})`,
+        transformOrigin: "top left",
+        width: `${100 * (100 / vm.uiScale)}vw`,
+        height: `${100 * (100 / vm.uiScale)}vh`,
+      }}
+      className="relative bg-[#1B1B2F] overflow-hidden flex font-sans text-white select-none transition-all duration-150"
       onMouseMove={(e) => {
         if (e.clientX <= 150) {
           vm.setIsHovered(true);
@@ -86,15 +94,8 @@ function MainMenuPage() {
           </button>
 
           <button
-            onClick={() => {
-              if (vm.usuarioLogado) {
-                vm.setPerfilVisualizado(vm.usuarioLogado);
-                vm.setIsProfileModalOpen(true);
-              } else {
-                vm.setIsAuthModalOpen(true);
-              }
-            }}
-            className={`cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 flex flex-col items-center gap-1 w-full px-2 ${vm.isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            onClick={() => vm.setIsProfilePopoverOpen(!vm.isProfilePopoverOpen)}
+            className={`btn-perfil-lateral cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 flex flex-col items-center gap-1 w-full px-2 ${vm.isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
           >
             {vm.usuarioLogado && vm.usuarioLogado.fotoPerfil ? (
               <img
@@ -118,6 +119,7 @@ function MainMenuPage() {
         </div>
 
         <button
+          onClick={() => vm.setIsSettingsModalOpen(true)}
           className={`cursor-pointer transition-all duration-300 hover:rotate-90 active:scale-90 ${vm.isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
           <img
@@ -127,6 +129,17 @@ function MainMenuPage() {
           />
         </button>
       </div>
+
+      <ProfilePopover
+        isOpen={vm.isProfilePopoverOpen}
+        onClose={() => vm.setIsProfilePopoverOpen(false)}
+        usuarioLogado={vm.usuarioLogado}
+        onOpenAuth={(registerMode) => vm.openAuthModalWithMode(registerMode)}
+        onOpenProfile={() => {
+          vm.setPerfilVisualizado(vm.usuarioLogado);
+          vm.setIsProfileModalOpen(true);
+        }}
+      />
 
       <div className="absolute right-[25%] top-1/2 -translate-y-1/2 select-none pointer-events-none z-10">
         <img
@@ -196,10 +209,7 @@ function MainMenuPage() {
         onClose={() => vm.setIsRankingModalOpen(false)}
         isServerConnected={vm.isServerConnected}
         rankingList={vm.rankingList}
-        onSelectPlayer={(player) => {
-          vm.setPerfilVisualizado(player);
-          vm.setIsProfileModalOpen(true);
-        }}
+        onSelectPlayer={vm.handleSelectUserFromRanking}
       />
 
       <ProfileModal
@@ -214,6 +224,16 @@ function MainMenuPage() {
         rankingList={vm.rankingList}
         onSaveCustomization={vm.handleSaveCustomization}
         onLogout={vm.handleLogout}
+      />
+
+      <SettingsModal
+        isOpen={vm.isSettingsModalOpen}
+        onClose={() => vm.setIsSettingsModalOpen(false)}
+        usuarioLogado={vm.usuarioLogado}
+        uiScale={vm.uiScale}
+        setUiScale={vm.setUiScale}
+        onLogout={vm.handleLogout}
+        onDeleteAccount={vm.handleDeleteAccount}
       />
     </div>
   );
