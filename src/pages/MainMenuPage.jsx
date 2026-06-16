@@ -72,7 +72,11 @@ function MainMenuPage() {
           ${vm.isHovered ? "pl-[95px]" : "pl-[5px]"}`}
       >
         <MenuButton text="Jogar" iconSrc={PlayImg} />
-        <MenuButton text="Inventário" iconSrc={PackageImg} />
+        <MenuButton
+          text="Inventário"
+          iconSrc={PackageImg}
+          onClick={vm.handleOpenInventarioClick}
+        />
         <MenuButton text="Baralhos" iconSrc={BaralhosImg} />
         <MenuButton text="Sair" iconSrc={ArrowLeftCircleImg} />
       </div>
@@ -235,6 +239,8 @@ function MainMenuPage() {
         onLogout={vm.handleLogout}
         onDeleteAccount={vm.handleDeleteAccount}
       />
+
+      <InventarioPage vm={vm} />
     </div>
   );
 }

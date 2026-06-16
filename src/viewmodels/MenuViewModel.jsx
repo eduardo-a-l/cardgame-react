@@ -30,6 +30,11 @@ export function useMenuViewModel() {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
 
+  const [inventarioCartas, setInventarioCartas] = useState([]);
+  const [cartaSelecionada, setCartaSelecionada] = useState(null);
+  const [isLoadingInventario, setIsLoadingInventario] = useState(false);
+  const [isInventarioOpen, setIsInventarioOpen] = useState(false);
+
   const testConnection = async (silent = false) => {
     try {
       const conectado = await apiService.testConnection();
@@ -65,6 +70,40 @@ export function useMenuViewModel() {
     }
   };
 
+  const loadInventario = async () => {
+    if (!usuarioLogado || !isServerConnected) return;
+    setIsLoadingInventario(true);
+    try {
+      const baseUrl = apiService.getBaseUrl();
+      const res = await fetch(`${baseUrl}/inventarios`);
+      if (res.ok) {
+        const data = await res.json();
+        const meusItens = data.filter(
+          (item) => item.idUsuario === usuarioLogado.idUsuario,
+        );
+
+        const cartasRes = await fetch(`${baseUrl}/cartas`);
+        if (cartasRes.ok) {
+          const todasCartas = await cartasRes.json();
+          const minhasCartasCompletas = meusItens
+            .map((item) => {
+              const dadosCarta = todasCartas.find(
+                (c) => c.idCarta === item.idCarta,
+              );
+              return { ...dadosCarta, idInventario: item.idInventario };
+            })
+            .filter((c) => c.idCarta);
+
+          setInventarioCartas(minhasCartasCompletas);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoadingInventario(false);
+    }
+  };
+
   useEffect(() => {
     if (isRankingModalOpen) {
       loadRanking();
@@ -75,8 +114,11 @@ export function useMenuViewModel() {
     if (usuarioLogado) {
       setAvatarUrl(usuarioLogado.fotoPerfil || "");
       setBannerUrl(usuarioLogado.banner || "");
+      if (isInventarioOpen) {
+        loadInventario();
+      }
     }
-  }, [usuarioLogado, isProfileModalOpen]);
+  }, [usuarioLogado, isProfileModalOpen, isInventarioOpen]);
 
   const handleSelectUserFromRanking = async (playerSummary) => {
     try {
@@ -159,12 +201,68 @@ export function useMenuViewModel() {
     }
   };
 
+  const handleVenderCarta = async (carta) => {
+    if (!usuarioLogado || !isServerConnected) return;
+    const valorVenda = Math.floor(carta.precoPadrao * 0.5);
+
+    try {
+      const baseUrl = apiService.getBaseUrl();
+      const res = await fetch(
+        `${baseUrl}/inventarios/${carta.idInventario || carta.idCarta}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (res.ok) {
+        const novoSaldoMoedas = usuarioLogado.moedas + valorVenda;
+
+        const updateRes = await fetch(`${baseUrl}/usuarios/customizar`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            idUsuario: usuarioLogado.idUsuario,
+            fotoPerfil: usuarioLogado.fotoPerfil,
+            banner: usuarioLogado.banner,
+          }),
+        });
+
+        const completo = await apiService.getUsuarioById(
+          usuarioLogado.idUsuario,
+        );
+        completo.moedas = novoSaldoMoedas;
+        setUsuarioLogado(completo);
+        localStorage.setItem("cardgame_user", JSON.stringify(completo));
+
+        setCartaSelecionada(null);
+        loadInventario();
+        alert(`Carta vendida com sucesso por +${valorVenda}G!`);
+      } else {
+        alert("Erro ao processar a venda no servidor.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Falha na conexão ao vender a carta.");
+    }
+  };
+
+  const handleOpenInventarioClick = () => {
+    if (!usuarioLogado) {
+      openAuthModalWithMode(false);
+    } else {
+      setIsInventarioOpen(true);
+    }
+  };
+
   const handleLogout = () => {
     setUsuarioLogado(null);
     setPerfilVisualizado(null);
     setIsProfileModalOpen(false);
     setIsSettingsModalOpen(false);
     setIsProfilePopoverOpen(false);
+    setIsInventarioOpen(false);
+    setCartaSelecionada(null);
+    setInventarioCartas([]);
     localStorage.removeItem("cardgame_user");
   };
 
@@ -172,7 +270,7 @@ export function useMenuViewModel() {
     if (!usuarioLogado) return;
     if (
       !window.confirm(
-        "ATENÇÃO: Tem certeza que deseja deletar sua conta permanentemente? Todos os seus dados serão apagados.",
+        "ATENÇÃO: Tem certeza que deseja deletar sua conta permanentemente? Todos os seus baralhos e inventário serão apagados.",
       )
     )
       return;
@@ -220,11 +318,19 @@ export function useMenuViewModel() {
     setAvatarUrl,
     bannerUrl,
     setBannerUrl,
+    inventarioCartas,
+    cartaSelecionada,
+    setCartaSelecionada,
+    isLoadingInventario,
+    isInventarioOpen,
+    setIsInventarioOpen,
     testConnection,
     handleSelectUserFromRanking,
     openAuthModalWithMode,
     handleAuthSubmit,
     handleSaveCustomization,
+    handleVenderCarta,
+    handleOpenInventarioClick,
     handleLogout,
     handleDeleteAccount,
   };
