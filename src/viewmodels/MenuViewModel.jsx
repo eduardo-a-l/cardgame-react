@@ -31,6 +31,7 @@ export function useMenuViewModel() {
   const [bannerUrl, setBannerUrl] = useState("");
 
   const [inventarioCartas, setInventarioCartas] = useState([]);
+  const [baralhosUsuario, setBaralhosUsuario] = useState([]);
   const [cartaSelecionada, setCartaSelecionada] = useState(null);
   const [isLoadingInventario, setIsLoadingInventario] = useState(false);
   const [isInventarioOpen, setIsInventarioOpen] = useState(false);
@@ -70,35 +71,58 @@ export function useMenuViewModel() {
     }
   };
 
-  const loadInventario = async () => {
+  const loadInventarioEBaralhos = async () => {
     if (!usuarioLogado || !isServerConnected) return;
     setIsLoadingInventario(true);
     try {
       const baseUrl = apiService.getBaseUrl();
-      const res = await fetch(`${baseUrl}/inventarios`);
+
+      const baralhosRes = await fetch(
+        `${baseUrl}/baralhos/${usuarioLogado.idUsuario}`,
+      );
+      let itensBloqueadosNosBaralhos = [];
+      if (baralhosRes.ok) {
+        const baralhosData = await baralhosRes.json();
+        setBaralhosUsuario(baralhosData);
+
+        baralhosData.forEach((b) => {
+          if (b.inventarios) {
+            b.inventarios.forEach((inv) => {
+              itensBloqueadosNosBaralhos.push(inv.idInventario);
+            });
+          }
+        });
+      }
+
+      const res = await fetch(`${baseUrl}/inventario`);
       if (res.ok) {
         const data = await res.json();
-        const meusItens = data.filter(
+
+        const meusItensDoBanco = data.filter(
           (item) => item.idUsuario === usuarioLogado.idUsuario,
         );
 
-        const cartasRes = await fetch(`${baseUrl}/cartas`);
-        if (cartasRes.ok) {
-          const todasCartas = await cartasRes.json();
-          const minhasCartasCompletas = meusItens
-            .map((item) => {
-              const dadosCarta = todasCartas.find(
-                (c) => c.idCarta === item.idCarta,
-              );
-              return { ...dadosCarta, idInventario: item.idInventario };
-            })
-            .filter((c) => c.idCarta);
+        const minhasCartasCompletas = meusItensDoBanco.map((item) => {
+          return {
+            idInventario: item.idInventario,
+            idCarta: item.carta?.idCarta || item.idCarta,
+            nome: item.carta?.nome || "Carta Desconhecida",
+            tipo: item.carta?.tipo || "Desconhecido",
+            raridade: item.carta?.raridade || "Comum",
+            precoPadrao: item.carta?.precoPadrao || 0,
+            vida: item.carta?.vida || null,
+            acao1: item.carta?.acao1 || null,
+            acao2: item.carta?.acao2 || null,
+            estaEmBaralho: itensBloqueadosNosBaralhos.includes(
+              item.idInventario,
+            ),
+          };
+        });
 
-          setInventarioCartas(minhasCartasCompletas);
-        }
+        setInventarioCartas(minhasCartasCompletas);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Erro ao carregar banco de dados:", err);
     } finally {
       setIsLoadingInventario(false);
     }
@@ -115,10 +139,10 @@ export function useMenuViewModel() {
       setAvatarUrl(usuarioLogado.fotoPerfil || "");
       setBannerUrl(usuarioLogado.banner || "");
       if (isInventarioOpen) {
-        loadInventario();
+        loadInventarioEBaralhos();
       }
     }
-  }, [usuarioLogado, isProfileModalOpen, isInventarioOpen]);
+  }, [usuarioLogado, isProfileModalOpen, isInventarioOpen, isServerConnected]);
 
   const handleSelectUserFromRanking = async (playerSummary) => {
     try {
@@ -203,21 +227,27 @@ export function useMenuViewModel() {
 
   const handleVenderCarta = async (carta) => {
     if (!usuarioLogado || !isServerConnected) return;
+
+    if (carta.estaEmBaralho) {
+      alert(
+        "Não é possível vender esta carta! Remova-a de todos os seus Baralhos antes de vendê-la.",
+      );
+      return;
+    }
+
     const valorVenda = Math.floor(carta.precoPadrao * 0.5);
 
     try {
       const baseUrl = apiService.getBaseUrl();
-      const res = await fetch(
-        `${baseUrl}/inventarios/${carta.idInventario || carta.idCarta}`,
-        {
-          method: "DELETE",
-        },
-      );
+
+      const res = await fetch(`${baseUrl}/inventario/${carta.idInventario}`, {
+        method: "DELETE",
+      });
 
       if (res.ok) {
         const novoSaldoMoedas = usuarioLogado.moedas + valorVenda;
 
-        const updateRes = await fetch(`${baseUrl}/usuarios/customizar`, {
+        await fetch(`${baseUrl}/usuarios/customizar`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -235,7 +265,7 @@ export function useMenuViewModel() {
         localStorage.setItem("cardgame_user", JSON.stringify(completo));
 
         setCartaSelecionada(null);
-        loadInventario();
+        loadInventarioEBaralhos();
         alert(`Carta vendida com sucesso por +${valorVenda}G!`);
       } else {
         alert("Erro ao processar a venda no servidor.");
@@ -263,6 +293,7 @@ export function useMenuViewModel() {
     setIsInventarioOpen(false);
     setCartaSelecionada(null);
     setInventarioCartas([]);
+    setBaralhosUsuario([]);
     localStorage.removeItem("cardgame_user");
   };
 

@@ -83,6 +83,11 @@ function InventarioPage({ vm }) {
                       : "border-white/10 hover:border-white/30"
                   }`}
                 >
+                  {carta.estaEmBaralho && (
+                    <span className="absolute top-2 right-2 text-[9px] bg-amber-600/90 text-white font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider border border-amber-400/30 shadow-sm z-10 animate-fadeIn">
+                      Em Baralho
+                    </span>
+                  )}
                   <div>
                     <div className="font-bold text-base truncate">
                       {carta.nome}
@@ -182,13 +187,28 @@ function InventarioPage({ vm }) {
               <div className="pt-4 border-t border-white/5">
                 <button
                   onClick={() => vm.handleVenderCarta(vm.cartaSelecionada)}
-                  className="w-full bg-[#21366B] hover:bg-red-900/40 border-2 border-[#C8911A] rounded-xl py-3 flex flex-col items-center justify-center transition-all active:scale-95 cursor-pointer group"
+                  disabled={vm.cartaSelecionada.estaEmBaralho}
+                  className={`w-full border-2 rounded-xl py-3 flex flex-col items-center justify-center transition-all active:scale-95 group ${
+                    vm.cartaSelecionada.estaEmBaralho
+                      ? "bg-gray-800 border-gray-600 opacity-50 cursor-not-allowed"
+                      : "bg-[#21366B] hover:bg-red-900/40 border-[#C8911A] cursor-pointer"
+                  }`}
                 >
                   <span className="font-black text-lg uppercase tracking-wider group-hover:text-red-200">
-                    Vender Carta
+                    {vm.cartaSelecionada.estaEmBaralho
+                      ? "Carta Equipada"
+                      : "Vender Carta"}
                   </span>
-                  <span className="text-sm font-mono text-green-400 font-bold mt-0.5">
-                    +{Math.floor(vm.cartaSelecionada.precoPadrao * 0.5)}G
+                  <span
+                    className={`text-sm font-mono font-bold mt-0.5 ${
+                      vm.cartaSelecionada.estaEmBaralho
+                        ? "text-amber-400"
+                        : "text-green-400"
+                    }`}
+                  >
+                    {vm.cartaSelecionada.estaEmBaralho
+                      ? "Remova do baralho para vender"
+                      : `+${Math.floor(vm.cartaSelecionada.precoPadrao * 0.5)}G`}
                   </span>
                 </button>
               </div>
