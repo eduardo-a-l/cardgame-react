@@ -229,12 +229,12 @@ function MainMenuPage() {
         <div className="flex flex-col items-center gap-8 w-full transition-opacity duration-200">
           <button
             onClick={() => setIsRankingModalOpen(true)}
-            className={`cursor-pointer transition-all duration-200 hover:scale-125 active:scale-90 filter-[brightness(0)] ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            className={`cursor-pointer transition-all duration-200 hover:scale-125 active:scale-90 ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
           >
             <img
               src={IconRankingImg}
               alt="Ranking"
-              className="w-[35px] h-[35px]"
+              className="w-[35px] h-[35px] brightness-0"
             />
           </button>
 
@@ -259,7 +259,7 @@ function MainMenuPage() {
               <img
                 src={UserImg}
                 alt="Perfil"
-                className="w-[35px] h-[35px] filter-[brightness(0)]"
+                className="w-[35px] h-[35px] brightness-0"
               />
             )}
             {usuarioLogado && (
@@ -271,28 +271,21 @@ function MainMenuPage() {
         </div>
 
         <button
-          className={`cursor-pointer transition-all duration-300 hover:rotate-90 active:scale-90 filter-[brightness(0)] ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+          className={`cursor-pointer transition-all duration-300 hover:rotate-90 active:scale-90 ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
           <img
             src={SettingsImg}
             alt="Configurações"
-            className="w-[35px] h-[35px]"
+            className="w-[35px] h-[35px] brightness-0"
           />
         </button>
       </div>
 
-      <div className="absolute right-[25%] top-1/2 -translate-y-1/2 select-none pointer-events-none z-10">
-        <img
-          src={LogoImg}
-          alt="Logo"
-          className="w-[480px] h-[480px] object-contain"
-        />
-        {usuarioLogado && (
-          <div className="text-center font-bold text-[#C8911A] text-[20px] tracking-wide mt-2">
-            Bem-vindo, {usuarioLogado.nomeUsuario}! ({usuarioLogado.moedas}G)
-          </div>
-        )}
-      </div>
+      <img
+        src={LogoImg}
+        alt="Logo"
+        className="w-[480px] h-[480px] object-contain"
+      />
 
       <div className="absolute bottom-8 -right-2 z-10">
         <MenuButton

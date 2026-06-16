@@ -16,8 +16,21 @@ function ProfileModal({
   const ehOProprioPerfil =
     usuarioLogado && usuarioLogado.idUsuario === usuario.idUsuario;
 
-  const posicaoRanking =
-    rankingList.findIndex((p) => p.idUsuario === usuario.idUsuario) + 1;
+  const indexUsuario = rankingList.findIndex(
+    (p) => p.idUsuario === usuario.idUsuario,
+  );
+  let posicaoRanking = indexUsuario + 1;
+
+  if (indexUsuario > 0) {
+    const usuarioAtual = rankingList[indexUsuario];
+    const primeiroEmpatado = rankingList.find(
+      (p) => p.pontos === usuarioAtual.pontos,
+    );
+    if (primeiroEmpatado) {
+      posicaoRanking = rankingList.indexOf(primeiroEmpatado) + 1;
+    }
+  }
+
   const textoRank = posicaoRanking > 0 ? `#${posicaoRanking}` : "Sem Rank";
 
   return (
@@ -60,7 +73,7 @@ function ProfileModal({
                   {usuario.nomeUsuario}
                 </h3>
                 <div className="text-[22px] font-black text-[#C8911A] tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] uppercase">
-                  {textoRank} Global
+                  {textoRank}
                 </div>
               </div>
             </div>
@@ -100,7 +113,7 @@ function ProfileModal({
                     </div>
                     <button
                       onClick={onSaveCustomization}
-                      className="bg-black border border-[#C8911A]/60 hover:bg-[#C8911A] hover:text-black text-[#C8911A] font-bold text-xs py-2 px-4 rounded transition-all cursor-pointer"
+                      className="bg-[#C8911A] hover:brightness-110 text-black font-bold text-xs py-2 px-4 rounded transition-all cursor-pointer"
                     >
                       Salvar Customização
                     </button>

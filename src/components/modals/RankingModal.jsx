@@ -20,9 +20,9 @@ function RankingModal({
         </button>
 
         <div className="flex items-center justify-center gap-2 mb-4">
-          <img src={IconRankingImg} alt="" className="w-8 h-8" />
+          <img src={IconRankingImg} alt="" className="w-8 h-8 brightness-0" />
           <h3 className="text-[#C8911A] text-[28px] font-bold">
-            Ranking Global
+            Classificação Global
           </h3>
         </div>
 
@@ -46,7 +46,11 @@ function RankingModal({
 
             <div className="flex-1 overflow-y-auto divide-y divide-[#21366B]/50 font-sans">
               {rankingList.map((player, index) => {
-                const position = index + 1;
+                const primeiroEmpatado = rankingList.find(
+                  (p) => p.pontos === player.pontos,
+                );
+                const position = rankingList.indexOf(primeiroEmpatado) + 1;
+
                 let colorClass = "text-white";
                 if (position === 1) colorClass = "text-[#D4AF37] font-bold";
                 if (position === 2) colorClass = "text-[#C0C0C0] font-bold";
