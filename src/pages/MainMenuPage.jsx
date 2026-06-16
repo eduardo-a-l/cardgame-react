@@ -193,6 +193,8 @@ function MainMenuPage() {
         </button>
       </div>
 
+      <InventarioPage vm={vm} />
+
       <AuthModal
         isOpen={vm.isAuthModalOpen}
         onClose={() => vm.setIsAuthModalOpen(false)}
@@ -239,8 +241,6 @@ function MainMenuPage() {
         onLogout={vm.handleLogout}
         onDeleteAccount={vm.handleDeleteAccount}
       />
-
-      <InventarioPage vm={vm} />
     </div>
   );
 }
