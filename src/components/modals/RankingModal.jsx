@@ -28,7 +28,7 @@ function RankingModal({
 
         {!isServerConnected ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center text-gray-400 space-y-2">
-            <span className="text-[18px] font-bold text-red-400">
+            <span className="text-[18px] font-bold text-red-400 uppercase tracking-wider">
               Conecte-se ao servidor primeiro
             </span>
             <p className="text-sm max-w-xs">

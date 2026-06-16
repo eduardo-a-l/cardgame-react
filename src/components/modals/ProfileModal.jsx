@@ -73,7 +73,7 @@ function ProfileModal({
                   {usuario.nomeUsuario}
                 </h3>
                 <div className="text-[22px] font-black text-[#C8911A] tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] uppercase">
-                  {textoRank}
+                  {textoRank} Global
                 </div>
               </div>
             </div>
