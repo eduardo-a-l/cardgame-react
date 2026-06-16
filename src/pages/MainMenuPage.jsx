@@ -49,11 +49,11 @@ function MainMenuPage() {
       />
 
       {vm.usuarioLogado && (
-        <div className="absolute top-6 right-6 z-30 flex flex-col items-end gap-1 bg-[#141423]/80 backdrop-blur border border-[#C8911A]/40 px-4 py-2 rounded-xl shadow-lg">
+        <div className="absolute top-6 right-6 z-30 flex items-center gap-4 bg-[#141423]/80 backdrop-blur border border-[#C8911A]/40 px-4 py-2 rounded-xl shadow-lg">
           <span className="text-[#C8911A] font-extrabold text-[15px] font-mono tracking-wide">
             {vm.usuarioLogado.moedas}G
           </span>
-          <span className="text-green-400 font-bold text-[12px] font-mono">
+          <span className="text-green-400 font-bold text-[15px] font-mono">
             {vm.usuarioLogado.pontos} P
           </span>
         </div>
