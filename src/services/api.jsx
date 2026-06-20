@@ -1,7 +1,8 @@
 class ApiService {
   constructor() {
     this.serverIp =
-      localStorage.getItem("cardgame_server_ip") || "localhost:5000";
+      localStorage.getItem("cardgame_server_ip") ||
+      "cardgame-api-9rj8.onrender.com";
   }
 
   setServerIp(ip) {
@@ -10,14 +11,23 @@ class ApiService {
   }
 
   getBaseUrl() {
-    return this.serverIp.startsWith("http")
-      ? this.serverIp
-      : `http://${this.serverIp}`;
+    if (this.serverIp.startsWith("http")) {
+      return this.serverIp;
+    }
+
+    return this.serverIp.includes("localhost") ||
+      this.serverIp.includes("127.0.0.1")
+      ? `http://${this.serverIp}`
+      : `https://${this.serverIp}`;
   }
 
   async testConnection() {
-    const res = await fetch(`${this.getBaseUrl()}/cartas`);
-    return res.ok;
+    try {
+      const res = await fetch(`${this.getBaseUrl()}/cartas`);
+      return res.ok;
+    } catch {
+      return false;
+    }
   }
 
   async login(username, password) {
