@@ -21,13 +21,15 @@ import { useMenuViewModel } from "../viewmodels/MenuViewModel.jsx";
 function MainMenuPage() {
   const vm = useMenuViewModel();
 
+  const scaleValue = Number(vm.uiScale) || 100;
+
   return (
     <div
       style={{
-        transform: `scale(${vm.uiScale / 100})`,
+        transform: `scale(${scaleValue / 100})`,
         transformOrigin: "top left",
-        width: `${100 * (100 / vm.uiScale)}vw`,
-        height: `${100 * (100 / vm.uiScale)}vh`,
+        width: `${100 * (100 / scaleValue)}vw`,
+        height: `${100 * (100 / scaleValue)}vh`,
       }}
       className="relative bg-[#1B1B2F] overflow-hidden flex font-sans text-white select-none transition-all duration-150"
       onMouseMove={(e) => {
@@ -187,7 +189,10 @@ function MainMenuPage() {
           className="bg-[#1B1B2F] text-white font-mono text-[14px] px-2 py-1 rounded border border-gray-600 focus:outline-none focus:border-[#C8911A] w-[180px]"
         />
         <button
-          onClick={() => vm.testConnection(false)}
+          onClick={async () => {
+            vm.setServerIpState(vm.serverIp);
+            await vm.testConnection(false);
+          }}
           className="bg-[#C8911A] text-black font-bold text-[12px] px-3 py-1 rounded-md cursor-pointer hover:brightness-110 active:scale-95 transition-all"
         >
           Testar

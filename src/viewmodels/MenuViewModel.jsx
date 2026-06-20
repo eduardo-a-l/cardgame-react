@@ -81,6 +81,7 @@ export function useMenuViewModel() {
         `${baseUrl}/baralhos/${usuarioLogado.idUsuario}`,
       );
       let itensBloqueadosNosBaralhos = [];
+
       if (baralhosRes.ok) {
         const baralhosData = await baralhosRes.json();
         setBaralhosUsuario(baralhosData);
@@ -98,8 +99,8 @@ export function useMenuViewModel() {
       if (res.ok) {
         const data = await res.json();
 
-        const meusItensDoBanco = data.filter(
-          (item) => item.idUsuario === usuarioLogado.idUsuario,
+        const meusItensDoBanco = (data || []).filter(
+          (item) => item && item.idUsuario === usuarioLogado.idUsuario,
         );
 
         const minhasCartasCompletas = meusItensDoBanco.map((item) => {
@@ -109,7 +110,7 @@ export function useMenuViewModel() {
             nome: item.carta?.nome || "Carta Desconhecida",
             tipo: item.carta?.tipo || "Desconhecido",
             raridade: item.carta?.raridade || "Comum",
-            precoPadrao: item.carta?.precoPadrao || 0,
+            precoPadrao: item.carta?.precopadrao || 0,
             vida: item.carta?.vida || null,
             acao1: item.carta?.acao1 || null,
             acao2: item.carta?.acao2 || null,
