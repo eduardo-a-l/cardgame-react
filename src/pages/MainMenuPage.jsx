@@ -20,7 +20,6 @@ import { useMenuViewModel } from "../viewmodels/MenuViewModel.jsx";
 
 function MainMenuPage() {
   const vm = useMenuViewModel();
-
   const scaleValue = Number(vm.uiScale) || 100;
 
   return (
@@ -197,6 +196,53 @@ function MainMenuPage() {
         >
           Testar
         </button>
+      </div>
+
+      <div className="fixed top-6 right-6 z-50 flex flex-col gap-3 w-80 pointer-events-none">
+        {vm.notifications.map((notif) => {
+          const isError = notif.type === "error";
+          const isSuccess = notif.type === "success";
+          const isLoading = notif.type === "loading";
+          let borderColor = "border-[#C8911A]/60";
+          let iconColor = "text-[#C8911A]";
+          if (isSuccess) {
+            borderColor = "border-green-500/60";
+            iconColor = "text-green-400";
+          }
+          if (isError) {
+            borderColor = "border-red-500/60";
+            iconColor = "text-red-400";
+          }
+          return (
+            <div
+              key={notif.id}
+              className={`pointer-events-auto flex items-center justify-between bg-[#141423]/95 backdrop-blur border-l-4 ${borderColor} p-4 rounded-r-xl shadow-2xl transition-all duration-300 animate-slideDown`}
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                {isLoading ? (
+                  <div
+                    className={`w-5 h-5 border-2 ${iconColor} border-t-transparent rounded-full animate-spin shrink-0`}
+                  />
+                ) : (
+                  <span className={`font-bold text-lg ${iconColor} shrink-0`}>
+                    {isSuccess ? "✓" : isError ? "✕" : "ℹ"}
+                  </span>
+                )}
+                <p className="text-sm font-medium text-white truncate">
+                  {notif.text}
+                </p>
+              </div>
+              {!notif.persistent && (
+                <button
+                  onClick={() => vm.dismissNotification(notif.id)}
+                  className="ml-3 text-gray-500 hover:text-white transition-colors cursor-pointer text-xs font-bold"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <InventarioPage vm={vm} />
