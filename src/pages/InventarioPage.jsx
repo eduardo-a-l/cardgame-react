@@ -77,10 +77,10 @@ function InventarioPage({ vm }) {
                 <div
                   key={`${carta.idCarta}-${index}`}
                   onClick={() => vm.setCartaSelecionada(carta)}
-                  className={`relative h-44 rounded-xl p-4 flex flex-col justify-between cursor-pointer border transition-all shadow-md active:scale-95 bg-linear-to-br ${getCardBackgroundColor(carta.tipo)} ${
+                  className={`relative h-52 rounded-xl p-4 flex items-center justify-center text-center cursor-pointer border-2 transition-all shadow-md active:scale-95 bg-linear-to-br ${getCardBackgroundColor(carta.tipo)} ${
                     vm.cartaSelecionada?.idInventario === carta.idInventario
                       ? "border-[#C8911A] scale-[1.02] shadow-[0_0_15px_rgba(200,145,26,0.3)]"
-                      : "border-white/10 hover:border-white/30"
+                      : "border-[#686868] hover:border-white/30"
                   }`}
                 >
                   {carta.estaEmBaralho && (
@@ -88,25 +88,8 @@ function InventarioPage({ vm }) {
                       Em Baralho
                     </span>
                   )}
-                  <div>
-                    <div className="font-bold text-base truncate">
-                      {carta.nome}
-                    </div>
-                    <div className="text-[11px] opacity-60 uppercase tracking-wide mt-0.5">
-                      {carta.tipo}
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-end">
-                    <span
-                      className={`text-xs font-bold ${getRaridadeColor(carta.raridade)}`}
-                    >
-                      {carta.raridade}
-                    </span>
-                    {carta.vida && (
-                      <span className="text-xs bg-black/40 px-2 py-0.5 rounded-md font-mono">
-                        HP: {carta.vida}
-                      </span>
-                    )}
+                  <div className="font-bold text-base text-white">
+                    {carta.nome}
                   </div>
                 </div>
               ))}
