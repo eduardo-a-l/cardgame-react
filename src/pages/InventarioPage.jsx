@@ -7,13 +7,13 @@ function InventarioPage({ vm }) {
   const getCardBackgroundColor = (tipo) => {
     switch (tipo) {
       case "Personagem":
-        return "from-[#2a437e] to-[#14213d]";
+        return "bg-[#21366B]";
       case "Suporte":
-        return "from-[#2a6f97] to-[#014f86]";
+        return "bg-[#53216B]";
       case "Campo":
-        return "from-[#6f2db8] to-[#3c096c]";
+        return "bg-[#216B35]";
       default:
-        return "from-[#4a4e69] to-[#22223b]";
+        return "bg-[#22223b]";
     }
   };
 
@@ -58,7 +58,7 @@ function InventarioPage({ vm }) {
       </div>
 
       <div className="flex-1 flex gap-6 overflow-hidden">
-        <div className="w-[60%] bg-[#141423]/60 border border-white/5 rounded-2xl p-4 flex flex-col overflow-hidden">
+        <div className="w-[60%] bg-[#0d0d1b] border border-white/5 rounded-2xl p-4 flex flex-col overflow-hidden">
           <div className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">
             Minhas Cartas ({vm.inventarioCartas.length})
           </div>
@@ -72,12 +72,12 @@ function InventarioPage({ vm }) {
               Você ainda não possui cartas em seu inventário.
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto grid grid-cols-3 gap-4 pr-1">
+            <div className="flex-1 overflow-y-auto grid grid-cols-5 gap-4 pr-1">
               {vm.inventarioCartas.map((carta, index) => (
                 <div
                   key={`${carta.idCarta}-${index}`}
                   onClick={() => vm.setCartaSelecionada(carta)}
-                  className={`relative h-52 rounded-xl p-4 flex items-center justify-center text-center cursor-pointer border-2 transition-all shadow-md active:scale-95 bg-linear-to-br ${getCardBackgroundColor(carta.tipo)} ${
+                  className={`relative h-52 rounded-xl p-3 flex items-center justify-center text-center cursor-pointer border-2 transition-all shadow-md active:scale-95 ${getCardBackgroundColor(carta.tipo)} ${
                     vm.cartaSelecionada?.idInventario === carta.idInventario
                       ? "border-[#C8911A] scale-[1.02] shadow-[0_0_15px_rgba(200,145,26,0.3)]"
                       : "border-[#686868] hover:border-white/30"
@@ -88,7 +88,7 @@ function InventarioPage({ vm }) {
                       Em Baralho
                     </span>
                   )}
-                  <div className="font-bold text-base text-white">
+                  <div className="font-bold text-sm text-white break-words">
                     {carta.nome}
                   </div>
                 </div>
@@ -102,7 +102,7 @@ function InventarioPage({ vm }) {
             <div className="flex flex-col h-full justify-between space-y-6">
               <div className="space-y-4">
                 <div
-                  className={`p-4 rounded-xl bg-linear-to-br border border-white/10 ${getCardBackgroundColor(vm.cartaSelecionada.tipo)}`}
+                  className={`p-4 rounded-xl border border-white/10 ${getCardBackgroundColor(vm.cartaSelecionada.tipo)}`}
                 >
                   <h3 className="text-2xl font-black text-center drop-shadow">
                     {vm.cartaSelecionada.nome}
