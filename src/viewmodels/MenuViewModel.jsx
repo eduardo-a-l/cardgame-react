@@ -1,9 +1,9 @@
-import { useModalState } from "../hooks/useModalState.js";
-import { useNotifications } from "../hooks/useNotifications.js";
-import { useConnection } from "../hooks/useConnection.js";
-import { useAuth } from "../hooks/useAuth.js";
-import { useRanking } from "../hooks/useRanking.js";
-import { useInventory } from "../hooks/useInventory.js";
+import { useModalState } from "../hooks/useModalState.jsx";
+import { useNotifications } from "../hooks/useNotifications.jsx";
+import { useConnection } from "../hooks/useConnection.jsx";
+import { useAuth } from "../hooks/useAuth.jsx";
+import { useRanking } from "../hooks/useRanking.jsx";
+import { useInventory } from "../hooks/useInventory.jsx";
 
 export function useMenuViewModel() {
   const modalState = useModalState();

@@ -85,41 +85,30 @@ export function useInventory(
       return;
     }
     const valorVenda = Math.floor(carta.precoPadrao * 0.5);
-    const novoSaldoMoedas = usuarioLogado.moedas + valorVenda;
     try {
       const baseUrl = apiService.getBaseUrl();
-      const res = await fetch(`${baseUrl}/inventario/${carta.idInventario}`, {
-        method: "DELETE",
+      const res = await fetch(`${baseUrl}/loja/vender/${usuarioLogado.idUsuario}/${carta.idCarta}`, {
+        method: "POST",
       });
       if (res.ok) {
-        await fetch(`${baseUrl}/usuarios/customizar`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            idUsuario: usuarioLogado.idUsuario,
-            fotoPerfil: usuarioLogado.fotoPerfil,
-            banner: usuarioLogado.banner,
-            moedas: novoSaldoMoedas,
-          }),
-        });
-        const completo = await apiService.getUsuarioById(
-          usuarioLogado.idUsuario
-        );
-        if (completo.moedas !== novoSaldoMoedas) {
-          completo.moedas = novoSaldoMoedas;
+        const data = await res.json();
+        const completo = await apiService.getUsuarioById(usuarioLogado.idUsuario);
+        if (completo.moedas !== data.novoSaldo) {
+          completo.moedas = data.novoSaldo;
         }
         setUsuarioLogado(completo);
         localStorage.setItem("cardgame_user", JSON.stringify(completo));
         setCartaSelecionada(null);
-        loadInventarioEBaralhos();
+        await loadInventarioEBaralhos();
         showNotification(
           `Carta vendida com sucesso por +${valorVenda}G!`,
           "success",
           3000
         );
       } else {
+        const errorData = await res.json().catch(() => ({}));
         showNotification(
-          "Erro ao processar a venda no servidor.",
+          errorData.mensagem || "Erro ao processar a venda no servidor.",
           "error",
           4000
         );
