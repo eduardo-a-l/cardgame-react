@@ -85,7 +85,7 @@ class ApiService {
   }
 
   async listarBaralhos(userId) {
-    const res = await fetch(`${this.getBaseUrl()}/baralhos/usuario/${userId}`);
+    const res = await fetch(`${this.getBaseUrl()}/baralhos/${userId}`);
     if (!res.ok) throw new Error();
     return res.json();
   }

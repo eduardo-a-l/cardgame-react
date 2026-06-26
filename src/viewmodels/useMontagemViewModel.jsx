@@ -1,29 +1,66 @@
 import { useState } from "react";
 import { apiService } from "../services/api";
 
+function getNomeCarta(item) {
+  return (
+    item?.carta?.nome ||
+    item?.carta?.Nome ||
+    item?.Carta?.nome ||
+    item?.Carta?.Nome ||
+    "Carta"
+  );
+}
+
+function getTipoCarta(item) {
+  return (
+    item?.carta?.tipo ||
+    item?.carta?.Tipo ||
+    item?.Carta?.tipo ||
+    item?.Carta?.Tipo ||
+    ""
+  );
+}
+
 export function useMontagemViewModel() {
   const [nomeBaralho, setNomeBaralho] = useState("");
   const [inventarioFull, setInventarioFull] = useState([]);
   const [itensNoBaralho, setItensNoBaralho] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const carregarDados = async (idBaralho, userId) => {
+    setIsLoading(true);
     try {
-      const invRes = await apiService.listarInventario();
-      const meusItens = invRes.filter((item) => item.idUsuario === userId);
+      const baseUrl = apiService.getBaseUrl();
+
+      const [invRes, baralhosData] = await Promise.all([
+        fetch(`${baseUrl}/inventario`).then((r) => r.json()),
+        apiService.listarBaralhos(userId),
+      ]);
+
+      const meusItens = (invRes || []).filter(
+        (item) =>
+          (item.idUsuario ?? item.IdUsuario) === userId
+      );
       setInventarioFull(meusItens);
 
-      const baralhos = await apiService.listarBaralhos(userId);
-      const baralhoAtual = baralhos.find((b) => b.idBaralho === idBaralho);
+      const baralhoAtual = baralhosData.find(
+        (b) => b.idBaralho === idBaralho
+      );
       if (baralhoAtual) {
         setNomeBaralho(baralhoAtual.nome);
-        setItensNoBaralho(baralhoAtual.inventarios || []);
+        setItensNoBaralho(baralhoAtual.Inventarios || baralhoAtual.inventarios || []);
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const adicionarCarta = (item) => {
+    const idInv = item.idInventario ?? item.IdInventario;
     const jaAdicionado = itensNoBaralho.some(
-      (i) => i.idInventario === item.idInventario,
+      (i) => (i.idInventario ?? i.IdInventario) === idInv
     );
     if (!jaAdicionado) {
       setItensNoBaralho((prev) => [...prev, item]);
@@ -31,28 +68,29 @@ export function useMontagemViewModel() {
   };
 
   const removerCarta = (item) => {
+    const idInv = item.idInventario ?? item.IdInventario;
     setItensNoBaralho((prev) =>
-      prev.filter((i) => i.idInventario !== item.idInventario),
+      prev.filter((i) => (i.idInventario ?? i.IdInventario) !== idInv)
     );
   };
 
-  const salvar = async (idBaralho, userId, onSucesso) => {
-    if (itensNoBaralho.length === 0) {
-      alert("Coloque ao menos uma carta no baralho!");
-      return;
-    }
+  const salvar = async (idBaralho, userId, onSucesso, onErro) => {
     try {
-      const baralho = {
+      const payload = {
         idBaralho,
         nome: nomeBaralho,
         idUsuario: userId,
-        inventarios: itensNoBaralho,
+        inventarios: itensNoBaralho.map((item) => ({
+          idInventario: item.idInventario ?? item.IdInventario,
+          idUsuario: item.idUsuario ?? item.IdUsuario ?? userId,
+          idCarta: item.idCarta ?? item.IdCarta ?? 0,
+        })),
       };
-      const sucesso = await apiService.atualizarBaralho(idBaralho, baralho);
-      if (sucesso) {
-        onSucesso();
-      }
-    } catch (e) {}
+      await apiService.atualizarBaralho(idBaralho, payload);
+      onSucesso?.();
+    } catch (e) {
+      onErro?.();
+    }
   };
 
   return {
@@ -60,9 +98,12 @@ export function useMontagemViewModel() {
     setNomeBaralho,
     inventarioFull,
     itensNoBaralho,
+    isLoading,
     carregarDados,
     adicionarCarta,
     removerCarta,
     salvar,
+    getNomeCarta,
+    getTipoCarta,
   };
 }
