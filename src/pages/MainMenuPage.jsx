@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import LogoImg from "../assets/Logo.svg";
 import PlayImg from "../assets/Play.svg";
 import PackageImg from "../assets/Package.svg";
@@ -16,11 +17,18 @@ import RankingModal from "../components/modals/RankingModal.jsx";
 import SettingsModal from "../components/modals/SettingsModal.jsx";
 import ProfilePopover from "../components/ProfilePopover.jsx";
 import InventarioPage from "./InventarioPage.jsx";
+import MeusBaralhosPage from "./MeusBaralhosPage.jsx";
+import MontagemBaralhoPage from "./MontagemBaralhoPage.jsx";
 import { useMenuViewModel } from "../viewmodels/MenuViewModel.jsx";
 
 function MainMenuPage() {
   const vm = useMenuViewModel();
   const scaleValue = Number(vm.uiScale) || 100;
+
+  const [abriuBaralhos, setAbriuBaralhos] = useState(false);
+  const [idBaralhoParaEditar, setIdBaralhoParaEditar] = useState(null);
+
+  const idUsuarioLogado = vm.usuarioLogado?.idUsuario || 1;
 
   return (
     <div
@@ -79,7 +87,11 @@ function MainMenuPage() {
           iconSrc={PackageImg}
           onClick={vm.handleOpenInventarioClick}
         />
-        <MenuButton text="Baralhos" iconSrc={BaralhosImg} />
+        <MenuButton
+          text="Baralhos"
+          iconSrc={BaralhosImg}
+          onClick={() => setAbriuBaralhos(true)}
+        />
         <MenuButton text="Sair" iconSrc={ArrowLeftCircleImg} />
       </div>
 
@@ -246,6 +258,22 @@ function MainMenuPage() {
       </div>
 
       <InventarioPage vm={vm} />
+
+      {abriuBaralhos && idBaralhoParaEditar === null && (
+        <MeusBaralhosPage
+          idUsuarioLogado={idUsuarioLogado}
+          onClose={() => setAbriuBaralhos(false)}
+          onEditarBaralho={(id) => setIdBaralhoParaEditar(id)}
+        />
+      )}
+
+      {abriuBaralhos && idBaralhoParaEditar !== null && (
+        <MontagemBaralhoPage
+          idBaralho={idBaralhoParaEditar}
+          idUsuarioLogado={idUsuarioLogado}
+          onVoltar={() => setIdBaralhoParaEditar(null)}
+        />
+      )}
 
       <AuthModal
         isOpen={vm.isAuthModalOpen}

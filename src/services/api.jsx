@@ -83,6 +83,51 @@ class ApiService {
     if (!res.ok) throw new Error();
     return true;
   }
+
+  async listarBaralhos(userId) {
+    const res = await fetch(`${this.getBaseUrl()}/baralhos/${userId}`);
+    if (!res.ok) throw new Error();
+    return res.json();
+  }
+
+  async criarBaralho(userId) {
+    const res = await fetch(`${this.getBaseUrl()}/baralhos`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        idBaralho: 0,
+        nome: "Novo Baralho",
+        idUsuario: userId,
+        inventarios: [],
+      }),
+    });
+    if (!res.ok) throw new Error();
+    return res.json();
+  }
+
+  async excluirBaralho(id) {
+    const res = await fetch(`${this.getBaseUrl()}/baralhos/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) throw new Error();
+    return res.ok;
+  }
+
+  async atualizarBaralho(id, baralho) {
+    const res = await fetch(`${this.getBaseUrl()}/baralhos/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(baralho),
+    });
+    if (!res.ok) throw new Error();
+    return res.ok;
+  }
+
+  async listarInventario() {
+    const res = await fetch(`${this.getBaseUrl()}/inventario`);
+    if (!res.ok) throw new Error();
+    return res.json();
+  }
 }
 
 export const apiService = new ApiService();
