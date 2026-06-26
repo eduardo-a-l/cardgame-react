@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import LogoImg from "../assets/Logo.svg";
 import PlayImg from "../assets/Play.svg";
 import PackageImg from "../assets/Package.svg";
