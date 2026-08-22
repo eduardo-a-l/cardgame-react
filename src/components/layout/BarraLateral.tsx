@@ -1,3 +1,5 @@
+"use client";
+
 import { BotaoIcone } from "@/components/ui/BotaoIcone";
 
 interface BarraLateralProps {
