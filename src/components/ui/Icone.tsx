@@ -1,3 +1,8 @@
+"use client";
+
+import Image from "next/image";
+import { ComponentProps } from "react";
+
 import IconeLeaderboard from "@/assets/icons/leaderboard.svg";
 import IconeUsuario from "@/assets/icons/user.svg";
 import IconeConfiguracoes from "@/assets/icons/settings.svg";
@@ -8,7 +13,6 @@ import IconeLoja from "@/assets/icons/shop.svg";
 import IconeVoltar from "@/assets/icons/back.svg";
 import IconeNovo from "@/assets/icons/plus.svg";
 import IconeParaBaixo from "@/assets/icons/down.svg";
-import { ComponentProps } from "react";
 
 const icones = {
   leaderboard: IconeLeaderboard,
@@ -21,11 +25,14 @@ const icones = {
   voltar: IconeVoltar,
   novo: IconeNovo,
   paraBaixo: IconeParaBaixo,
-};
+} as const;
 
 export type NomeIcone = keyof typeof icones;
 
-interface IconeProps extends ComponentProps<"svg"> {
+interface IconeProps extends Omit<
+  ComponentProps<"img">,
+  "src" | "alt" | "width" | "height"
+> {
   nome: NomeIcone;
   tamanho?: number;
   className?: string;
@@ -37,17 +44,19 @@ export function Icone({
   className = "",
   ...props
 }: IconeProps) {
-  const ComponenteSvg = icones[nome];
+  const fonteSvg = icones[nome];
 
-  if (!ComponenteSvg) {
+  if (!fonteSvg) {
     return null;
   }
 
   return (
-    <ComponenteSvg
+    <Image
+      src={fonteSvg}
+      alt={nome}
       width={tamanho}
       height={tamanho}
-      className={`shrink-0 fill-current ${className}`}
+      className={`shrink-0 ${className}`}
       {...props}
     />
   );
