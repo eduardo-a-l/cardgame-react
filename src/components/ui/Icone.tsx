@@ -1,6 +1,3 @@
-"use client";
-
-import Image from "next/image";
 import { ComponentProps } from "react";
 
 import IconeLeaderboard from "@/assets/icons/leaderboard.svg";
@@ -29,13 +26,9 @@ const icones = {
 
 export type NomeIcone = keyof typeof icones;
 
-interface IconeProps extends Omit<
-  ComponentProps<"img">,
-  "src" | "alt" | "width" | "height"
-> {
+interface IconeProps extends ComponentProps<"svg"> {
   nome: NomeIcone;
   tamanho?: number;
-  className?: string;
 }
 
 export function Icone({
@@ -44,19 +37,13 @@ export function Icone({
   className = "",
   ...props
 }: IconeProps) {
-  const fonteSvg = icones[nome];
-
-  if (!fonteSvg) {
-    return null;
-  }
+  const IconeSelecionado = icones[nome];
 
   return (
-    <Image
-      src={fonteSvg}
-      alt={nome}
+    <IconeSelecionado
+      className={className}
       width={tamanho}
       height={tamanho}
-      className={`shrink-0 ${className}`}
       {...props}
     />
   );
