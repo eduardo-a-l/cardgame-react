@@ -6,6 +6,7 @@ import { Icone, NomeIcone } from "./Icone";
 interface BotaoProps extends ComponentProps<"button"> {
   texto?: string;
   nomeIcone?: NomeIcone;
+  tamanhoIcone?: number;
   corDeFundo?: string;
   corDaBorda?: string;
   corDoTexto?: string;
@@ -14,6 +15,7 @@ interface BotaoProps extends ComponentProps<"button"> {
 export function Botao({
   texto,
   nomeIcone,
+  tamanhoIcone = 20,
   corDeFundo = "#21366B",
   corDaBorda = "#C8911A",
   corDoTexto = "#FFFFFF",
@@ -29,10 +31,10 @@ export function Botao({
         borderColor: corDaBorda,
         ...style,
       }}
-      className={`flex items-center gap-3 px-5 py-2.5 border-2 rounded-xl ${className}`}
+      className={`flex items-center gap-4 px-6 py-3 border-2 rounded-xl text-lg ${className}`}
       {...props}
     >
-      {nomeIcone && <Icone nome={nomeIcone} tamanho={20} />}
+      {nomeIcone && <Icone nome={nomeIcone} tamanho={tamanhoIcone} />}
       {texto && <span>{texto}</span>}
     </button>
   );

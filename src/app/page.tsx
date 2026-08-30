@@ -1,5 +1,6 @@
 import { BarraLateral } from "@/components/layout/BarraLateral";
 import { Botao } from "@/components/ui/Botao";
+import Logo from "@/assets/logo.svg";
 
 export default function PaginaPrincipal() {
   return (
@@ -8,26 +9,43 @@ export default function PaginaPrincipal() {
         <BarraLateral />
       </div>
 
-      <div>
+      <div className="flex flex-col justify-center gap-40">
         <Botao
           texto="Jogar"
           nomeIcone="jogar"
-          className="-ml-3 rounded-l-none"
+          tamanhoIcone={40}
+          corDoTexto="#FFFFFF"
+          className="-ml-1 rounded-l-none px-30 py-10 text-xl"
         />
         <Botao
           texto="Inventário"
           nomeIcone="inventario"
-          className="-ml-3 rounded-l-none"
+          tamanhoIcone={40}
+          corDoTexto="#FFFFFF"
+          className="-ml-1 rounded-l-none px-30 py-10 text-xl"
+        />
+        <Botao
+          texto="Baralhos"
+          nomeIcone="baralho"
+          tamanhoIcone={40}
+          corDoTexto="#FFFFFF"
+          className="-ml-1 rounded-l-none px-30 py-10 text-xl "
         />
       </div>
 
-      <div className="absolute bottom-4 right-4">
+      <div className="absolute inset-0 flex items-center justify-center -mr-50">
+        <Logo className="w-auto h-auto" />
+      </div>
+
+      <div className="absolute bottom-20 right-0">
         <Botao
           texto="Loja"
           nomeIcone="loja"
+          tamanhoIcone={40}
           corDeFundo="#C8911A"
           corDoTexto="#000000"
-          corDaBorda="686868"
+          corDaBorda="#686868"
+          className="rounded-r-none -mr-1 px-30 py-10 text-xl"
         />
       </div>
     </main>
