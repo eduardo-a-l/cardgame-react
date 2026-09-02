@@ -3,7 +3,8 @@ import React, { use, useState } from "react";
 import { Botao } from "@/components/ui/Botao";
 import { Icone } from "@/components/ui/Icone";
 import { BotaoIcone } from "@/components/ui/BotaoIcone";
-export default function Selecioar_oponente()
+import Back from "@/components/ui/icons/Back";
+export default function Selecionar_oponente()
 {
 
     const [ListaOponentes, setListaOponentes] = useState(
@@ -14,8 +15,12 @@ export default function Selecioar_oponente()
     const [pin, setPin] = useState("")
 
     return (
-        <div className= "bg-blue-950 flex flex-col min-h-screen max-w-3xl  min-w-screen relative">
-            <BotaoIcone nomeIcone="voltar" tamanhoIcone={45}  className="text-white  text-5xl ml-8 mt-8 gap-1 absolute left-0 ">Voltar</BotaoIcone>
+
+        <div className=" bg-gray-900 min-h-screen min-w-screen flex justify-center">
+
+        <div className= "bg-blue flex flex-col min-h-screen max-w-custom w-full relative shadow-black shadow-2xl">
+            <button className="w-44 h-12 hover:scale-105 transition-all flex justify-center cursor-pointer  text-4xl ml-8 mt-10 gap-2.5"> <Back className="h-11 w-11"/> Voltar</button>
+            
 
             <div className="flex  justify-center">
 
@@ -24,19 +29,19 @@ export default function Selecioar_oponente()
                 </div> 
                 
                 <div className="flex flex-col">
-                    <div className="flex justify-around text-3xl mt-40">
+                    <div className="flex justify-between pr-15 pl-15 w-full text-3xl mt-40">
                         <p>Usuário</p>
                         <p>PIN de Batalha {}</p>
                     </div>
-                    <div className="flex justify-between pr-79 pl-79">
+                    <div className="flex justify-between pr-15 pl-15">
                         <div className="relative">
                         <input type="text" readOnly value={usuario || "Escolher Oponente"} className= {`  border border-gray-500 w-100 pl-2  h-10 ${!(usuario != "")? "text-gray-400" : ""}` } />
                         <button className="absolute right-0 pr-2.5 pt-2 cursor-pointer hover:scale-105 transition-all" onClick={() => setAberto(!Aberto)}>{Aberto ? "▼" : "▲"}</button>
                         { Aberto &&(
-                        <ul className= "absolute right-0 bg-blue-700  rounded-md w-30 transition-all shadow-black shadow-2xl">
+                        <ul className= "absolute right-0    w-100  transition-all shadow-black shadow-2xl border-b border-r border-l border-gray-500">
                             {ListaOponentes?.map((User, index) => 
                                     (
-                                        <li key={index} className="pl-3.5 pb-1 cursor-pointer rounded-md hover:scale-105 transition-all hover:bg-blue-800 border-b border-b-blue-950" onClick={() =>{setAberto(false); setUsuario(User); }}>{User}</li>
+                                        <li key={index} className="pl-3.5 pb-1 cursor-pointer    hover:border-2 hover:border-white  pl-38 transition-all border-b border-b-gray-500" onClick={() =>{setAberto(false); setUsuario(User); }}>{User}</li>
                                     ))}
                         </ul>)
                         }
@@ -55,6 +60,7 @@ export default function Selecioar_oponente()
                         </div>
 
                 </div>
+        </div>
         </div>
     );
 
