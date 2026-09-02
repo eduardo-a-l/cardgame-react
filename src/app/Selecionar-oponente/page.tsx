@@ -18,13 +18,13 @@ export default function Selecionar_oponente()
 
         <div className=" bg-gray-900 min-h-screen min-w-screen flex justify-center">
 
-        <div className= "bg-blue flex flex-col min-h-screen max-w-custom w-full relative shadow-black shadow-2xl">
+        <div className= "bg-blue flex flex-col min-h-screen max-w-full w-full relative shadow-black shadow-2xl">
             <button className="w-44 h-12 hover:scale-105 transition-all flex justify-center cursor-pointer  text-4xl ml-8 mt-10 gap-2.5"> <Back className="h-11 w-11"/> Voltar</button>
             
 
             <div className="flex  justify-center">
 
-                <p className="text-5xl mt-24">Selecionar oponente</p>
+                <p className="text-5xl mt-13">Selecionar oponente</p>
 
                 </div> 
                 
