@@ -24,7 +24,7 @@ export function BarraLateral({
     >
       <div className="flex flex-col gap-3">
         <BotaoIcone nomeIcone="leaderboard" onClick={() => ""} />
-        <BotaoIcone nomeIcone="usuario" onClick={() => ""} />
+        <BotaoIcone nomeIcone="usuario" onClick={(() => router.push("/login"))} />
       </div>
 
       <BotaoIcone
