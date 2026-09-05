@@ -24,14 +24,14 @@ export default function Selecionar_oponente()
 
             <div className="flex  justify-center">
 
-                <p className="text-5xl mt-13">Selecionar oponente</p>
+                <p className="text-5xl text-white mt-13">Selecionar oponente</p>
 
                 </div> 
                 
                 <div className="flex flex-col">
                     <div className="flex justify-between pr-15 pl-15 w-full text-3xl mt-40">
-                        <p>Usuário</p>
-                        <p>PIN de Batalha {}</p>
+                        <p className="text-white">Usuário</p>
+                        <p className="text-white">PIN de Batalha {}</p>
                     </div>
                     <div className="flex justify-between pr-15 pl-15">
                         <div className="relative">
