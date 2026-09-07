@@ -4,6 +4,7 @@ import { Botao } from "@/components/ui/Botao";
 import { Icone } from "@/components/ui/Icone";
 import { BotaoIcone } from "@/components/ui/BotaoIcone";
 import Back from "@/components/ui/icons/Back";
+import { useRouter } from "next/router";
 export default function Selecionar_oponente() {
   const [ListaOponentes, setListaOponentes] = useState(
     Array.from({ length: 10 }, (_, index) => `Oponente ${index + 1}`),
@@ -11,11 +12,15 @@ export default function Selecionar_oponente() {
   const [Aberto, setAberto] = useState(false);
   const [usuario, setUsuario] = useState("");
   const [pin, setPin] = useState("");
+  const router = useRouter();
 
   return (
     <div className=" bg-gray-900 min-h-screen min-w-screen flex justify-center">
       <div className="bg-blue flex flex-col min-h-screen max-w-full w-full relative shadow-black shadow-2xl">
-        <button className="w-44 h-12 hover:scale-105 transition-all flex justify-center cursor-pointer text-white text-4xl ml-8 mt-10 gap-2.5">
+        <button
+          className="w-44 h-12 hover:scale-105 transition-all flex justify-center cursor-pointer text-white text-4xl ml-8 mt-10 gap-2.5"
+          onClick={() => router.push("/")}
+        >
           {" "}
           <Back className="h-11 w-11" /> Voltar
         </button>
