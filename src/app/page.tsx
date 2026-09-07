@@ -21,7 +21,7 @@ export default function PaginaPrincipal() {
           tamanhoIcone={40}
           corDoTexto="#FFFFFF"
           className="-ml-1 rounded-l-none px-30 py-10 text-xl"
-          onClick={() => router.push("/selecionar-oponente")}
+          onClick={() => router.push("")}
         />
         <Botao
           texto="Inventário"
